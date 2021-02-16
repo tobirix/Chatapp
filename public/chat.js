@@ -1,10 +1,10 @@
 async function fetchChatMessages() {
     const container = document.querySelector('#chat-messages');
-    container.innerHTML = '<p>Loading...</p>';
+    container.innerHTML = '<p>Loading</p>';
     const response = await fetch('/chats/123');
     const messages = await response.json();
-    container.innerHTML = '';
 
+    container.innerHTML = '';
     for (const message of messages) {
         const element = document.createElement('p');
         element.innerText = message;
@@ -28,7 +28,22 @@ async function createChatMessage() {
 }
 
 window.addEventListener('load', fetchChatMessages);
+
 document.querySelector('#chat-form').addEventListener('submit', event => {
     event.preventDefault();
     createChatMessage();
+});
+
+window.addEventListener('load', () => {
+    const socket = io();
+    socket.on('connect', () => {
+        console.log("Connection hergestellt");
+        socket.emit('join', {
+            id: 123
+        });
+    });
+    socket.on('refresh', data => {
+        console.log("REFRESH", data);
+        fetchChatMessages();
+    });
 });
